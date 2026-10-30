@@ -74,6 +74,7 @@ export default function Hero() {
   const now = useSyncExternalStore(noopSubscribe, currentHour, () => null);
   const [offset, setOffset] = useState(0);
   const [touched, setTouched] = useState(false);
+  const [loaded, setLoaded] = useState(false);
   const hour = now === null ? null : now + offset;
 
   useEffect(() => {
@@ -92,6 +93,7 @@ export default function Hero() {
 
   const g = useMemo(() => gradeAt(hour ?? 12), [hour]);
   const ready = hour !== null;
+  const shown = ready && loaded;
 
   const shift = (step: number) => {
     setTouched(true);
@@ -103,40 +105,54 @@ export default function Hero() {
       <div
         aria-hidden="true"
         onClick={() => shift(2)}
-        className="relative -mb-10 h-[clamp(200px,30vw,340px)] w-full overflow-hidden [mask-image:linear-gradient(to_bottom,black_55%,transparent_94%)] sm:pointer-events-none"
+        className="relative -mb-14 h-[clamp(220px,32vw,380px)] w-full overflow-hidden hero-fade sm:pointer-events-none"
       >
-        <div className="absolute inset-0 [animation:drift_70s_ease-in-out_infinite_alternate]">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/mountains.webp"
-            alt=""
-            className="absolute inset-0 h-full w-full object-cover object-[50%_22%] transition-[filter,opacity] duration-700 ease-out"
-            style={{
-              opacity: ready ? 1 : 0,
-              filter: `brightness(${g.brightness}) saturate(${g.saturate}) sepia(${g.sepia}) hue-rotate(${g.hue}deg)`,
-            }}
-          />
-          <div
-            className="absolute inset-0 mix-blend-soft-light transition-[background-color] duration-700 ease-out"
-            style={{ backgroundColor: `rgba(${g.tint.join(",")})` }}
-          />
-          <div
-            className="absolute inset-0 transition-opacity duration-700 [mask-image:linear-gradient(to_bottom,black_15%,transparent_45%)]"
-            style={{ opacity: ready ? g.stars : 0 }}
-          >
-            {STARS.map((s, i) => (
-              <span
-                key={i}
-                className="absolute rounded-full bg-white [animation:twinkle_4s_ease-in-out_infinite]"
-                style={{
-                  left: `${s.x}%`,
-                  top: `${s.y}%`,
-                  width: s.size,
-                  height: s.size,
-                  animationDelay: `${s.delay}s`,
-                }}
-              />
-            ))}
+        {/* Opening: the scene washes in from the page colour, soft and slightly zoomed, then settles. */}
+        <div
+          className="absolute inset-0 transition-[opacity,filter,transform] duration-[1800ms] ease-[cubic-bezier(0.22,1,0.36,1)] will-change-[opacity,filter,transform]"
+          style={{
+            opacity: shown ? 1 : 0,
+            filter: shown ? "blur(0px)" : "blur(14px)",
+            transform: shown ? "scale(1)" : "scale(1.06)",
+          }}
+        >
+          <div className="absolute inset-0 [animation:drift_70s_ease-in-out_infinite_alternate]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              ref={(img) => {
+                if (img?.complete) setLoaded(true);
+              }}
+              onLoad={() => setLoaded(true)}
+              src="/mountains.webp"
+              alt=""
+              fetchPriority="high"
+              className="absolute inset-0 h-full w-full object-cover object-[50%_22%] transition-[filter] duration-700 ease-out"
+              style={{
+                filter: `brightness(${g.brightness}) saturate(${g.saturate}) sepia(${g.sepia}) hue-rotate(${g.hue}deg)`,
+              }}
+            />
+            <div
+              className="absolute inset-0 mix-blend-soft-light transition-[background-color] duration-700 ease-out"
+              style={{ backgroundColor: `rgba(${g.tint.join(",")})` }}
+            />
+            <div
+              className="absolute inset-0 transition-opacity duration-700 [mask-image:linear-gradient(to_bottom,black_15%,transparent_45%)]"
+              style={{ opacity: ready ? g.stars : 0 }}
+            >
+              {STARS.map((s, i) => (
+                <span
+                  key={i}
+                  className="absolute rounded-full bg-white [animation:twinkle_4s_ease-in-out_infinite]"
+                  style={{
+                    left: `${s.x}%`,
+                    top: `${s.y}%`,
+                    width: s.size,
+                    height: s.size,
+                    animationDelay: `${s.delay}s`,
+                  }}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </div>

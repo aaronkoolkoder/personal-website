@@ -35,6 +35,24 @@ body {
   color: oklch(0.141 0.005 285.823);
 }
 
+/* Eased fade (an ease-in-out curve sampled into stops) so the photo melts into the page with no visible band. */
+.hero-fade {
+  mask-image: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 38%,
+    rgb(0 0 0 / 0.96) 46%,
+    rgb(0 0 0 / 0.88) 53%,
+    rgb(0 0 0 / 0.76) 60%,
+    rgb(0 0 0 / 0.6) 67%,
+    rgb(0 0 0 / 0.43) 74%,
+    rgb(0 0 0 / 0.27) 81%,
+    rgb(0 0 0 / 0.14) 87%,
+    rgb(0 0 0 / 0.05) 93%,
+    transparent 100%
+  );
+}
+
 @keyframes drift {
   from {
     transform: scale(1.08) translate3d(-1.5%, 0, 0);
