@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 
 const inter = Inter({
@@ -22,10 +23,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${inter.variable} h-dvh overflow-hidden overscroll-none antialiased`}
       suppressHydrationWarning
     >
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-      </head>
       <body className="flex h-dvh flex-col overflow-hidden overscroll-none">
+        <Script id="theme" strategy="beforeInteractive">
+          {themeScript}
+        </Script>
         <noscript>
           <style>{"[data-fit] { opacity: 1 !important; }"}</style>
         </noscript>
