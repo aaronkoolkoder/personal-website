@@ -1,3 +1,7 @@
 # personal website
 
-minimal site, one cool detail. built w/ astro (soon).
+minimal site w/ a mac-style dock for tabs. next.js + tailwind + shadcn structure.
+
+```bash
+npm run dev
+```
