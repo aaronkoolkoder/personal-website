@@ -4,14 +4,14 @@
   --background: #ffffff;
   --foreground: oklch(0.141 0.005 285.823);
   --muted: oklch(0.552 0.016 285.938);
-  --underline: oklch(0.871 0.006 286.286);
+  --line: oklch(0.871 0.006 286.286);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
-  --color-underline: var(--underline);
+  --color-line: var(--line);
   --font-sans: var(--font-inter);
 }
 
@@ -20,7 +20,7 @@
     --background: oklch(0.16 0.006 270);
     --foreground: oklch(0.93 0.004 270);
     --muted: oklch(0.65 0.01 270);
-    --underline: oklch(0.38 0.01 270);
+    --line: oklch(0.38 0.01 270);
   }
 }
 

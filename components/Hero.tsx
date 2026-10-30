@@ -1,15 +1,160 @@
+"use client";
+
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+
+// The photo is re-graded through the day: filter values and a soft-light tint
+// are interpolated between these keyframes (hour of day, 0–24).
+type Grade = {
+  h: number;
+  brightness: number;
+  saturate: number;
+  sepia: number;
+  hue: number;
+  tint: [number, number, number, number];
+  stars: number;
+};
+
+const GRADES: Grade[] = [
+  { h: 0, brightness: 0.45, saturate: 0.6, sepia: 0, hue: 12, tint: [20, 30, 90, 0.5], stars: 1 },
+  { h: 5, brightness: 0.55, saturate: 0.7, sepia: 0.05, hue: 8, tint: [60, 50, 120, 0.4], stars: 0.7 },
+  { h: 6.5, brightness: 0.95, saturate: 1.25, sepia: 0.3, hue: -20, tint: [255, 140, 130, 0.35], stars: 0.1 },
+  { h: 9, brightness: 1.1, saturate: 1.1, sepia: 0.05, hue: 0, tint: [255, 230, 200, 0.1], stars: 0 },
+  { h: 13, brightness: 1.22, saturate: 1.15, sepia: 0, hue: 0, tint: [200, 225, 255, 0.15], stars: 0 },
+  { h: 17.5, brightness: 1.05, saturate: 1.35, sepia: 0.35, hue: -12, tint: [255, 160, 70, 0.35], stars: 0 },
+  { h: 19.5, brightness: 0.8, saturate: 1.1, sepia: 0.2, hue: -18, tint: [170, 90, 170, 0.4], stars: 0.3 },
+  { h: 21.5, brightness: 0.52, saturate: 0.7, sepia: 0, hue: 10, tint: [30, 35, 100, 0.5], stars: 0.9 },
+  { h: 24, brightness: 0.45, saturate: 0.6, sepia: 0, hue: 12, tint: [20, 30, 90, 0.5], stars: 1 },
+];
+
+const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+
+function gradeAt(hour: number): Grade {
+  const h = ((hour % 24) + 24) % 24;
+  const i = GRADES.findIndex((g) => g.h > h);
+  const a = GRADES[i - 1];
+  const b = GRADES[i];
+  const t = (h - a.h) / (b.h - a.h);
+  return {
+    h,
+    brightness: lerp(a.brightness, b.brightness, t),
+    saturate: lerp(a.saturate, b.saturate, t),
+    sepia: lerp(a.sepia, b.sepia, t),
+    hue: lerp(a.hue, b.hue, t),
+    tint: a.tint.map((v, k) => lerp(v, b.tint[k], t)) as Grade["tint"],
+    stars: lerp(a.stars, b.stars, t),
+  };
+}
+
+function formatHour(hour: number) {
+  const h = ((hour % 24) + 24) % 24;
+  const mins = Math.round((h % 1) * 60);
+  const h12 = Math.floor(h) % 12 || 12;
+  return `${h12}:${String(mins).padStart(2, "0")} ${h < 12 ? "am" : "pm"}`;
+}
+
+// Fixed pseudo-random star field so server and client markup match.
+const STARS = Array.from({ length: 70 }, (_, i) => {
+  const r = (n: number) => {
+    const x = Math.sin(i * 12.9898 + n * 78.233) * 43758.5453;
+    return x - Math.floor(x);
+  };
+  const round = (n: number) => Math.round(n * 100) / 100;
+  return { x: round(r(1) * 100), y: round(r(2) * 42), size: r(3) < 0.85 ? 1 : 2, delay: round(r(4) * 6) };
+});
+
+const noopSubscribe = () => () => {};
+
+function currentHour() {
+  const now = new Date();
+  return now.getHours() + now.getMinutes() / 60;
+}
+
 export default function Hero() {
+  // null on the server, the visitor's local time once hydrated
+  const now = useSyncExternalStore(noopSubscribe, currentHour, () => null);
+  const [offset, setOffset] = useState(0);
+  const [touched, setTouched] = useState(false);
+  const hour = now === null ? null : now + offset;
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const target = e.target as HTMLElement;
+      if (target.isContentEditable || ["INPUT", "TEXTAREA"].includes(target.tagName)) return;
+      const step = e.key === "h" || e.key === "ArrowLeft" ? -1 : e.key === "l" || e.key === "ArrowRight" ? 1 : 0;
+      if (!step) return;
+      setTouched(true);
+      setOffset((o) => o + step);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  const g = useMemo(() => gradeAt(hour ?? 12), [hour]);
+  const ready = hour !== null;
+
+  const shift = (step: number) => {
+    setTouched(true);
+    setOffset((o) => o + step);
+  };
+
   return (
-    <div
-      aria-hidden="true"
-      className="pointer-events-none relative -mb-10 h-[clamp(190px,26vw,300px)] w-full overflow-hidden [mask-image:linear-gradient(to_bottom,black_55%,transparent_92%)]"
-    >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/mountains.webp"
-        alt=""
-        className="absolute inset-0 h-full w-full object-cover object-[50%_32%] [animation:drift_60s_ease-in-out_infinite_alternate]"
-      />
+    <div className="relative">
+      <div
+        aria-hidden="true"
+        onClick={() => shift(2)}
+        className="relative -mb-10 h-[clamp(200px,30vw,340px)] w-full overflow-hidden [mask-image:linear-gradient(to_bottom,black_55%,transparent_94%)] sm:pointer-events-none"
+      >
+        <div className="absolute inset-0 [animation:drift_70s_ease-in-out_infinite_alternate]">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/mountains.webp"
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover object-[50%_22%] transition-[filter,opacity] duration-700 ease-out"
+            style={{
+              opacity: ready ? 1 : 0,
+              filter: `brightness(${g.brightness}) saturate(${g.saturate}) sepia(${g.sepia}) hue-rotate(${g.hue}deg)`,
+            }}
+          />
+          <div
+            className="absolute inset-0 mix-blend-soft-light transition-[background-color] duration-700 ease-out"
+            style={{ backgroundColor: `rgba(${g.tint.join(",")})` }}
+          />
+          <div
+            className="absolute inset-0 transition-opacity duration-700 [mask-image:linear-gradient(to_bottom,black_15%,transparent_45%)]"
+            style={{ opacity: ready ? g.stars : 0 }}
+          >
+            {STARS.map((s, i) => (
+              <span
+                key={i}
+                className="absolute rounded-full bg-white [animation:twinkle_4s_ease-in-out_infinite]"
+                style={{
+                  left: `${s.x}%`,
+                  top: `${s.y}%`,
+                  width: s.size,
+                  height: s.size,
+                  animationDelay: `${s.delay}s`,
+                }}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="absolute top-2 right-3 hidden text-center font-mono text-[10px] tracking-wide text-white/60 select-none sm:block">
+        <div>
+          <button onClick={() => shift(-1)} className="px-1 transition-colors hover:text-white" aria-label="Earlier">
+            ←
+          </button>
+          h · l
+          <button onClick={() => shift(1)} className="px-1 transition-colors hover:text-white" aria-label="Later">
+            →
+          </button>
+        </div>
+        <div className={`transition-opacity duration-500 ${touched ? "opacity-100" : "opacity-0"}`} aria-live="polite">
+          {ready ? formatHour(hour) : ""}
+        </div>
+      </div>
     </div>
   );
 }

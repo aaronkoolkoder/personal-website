@@ -26,7 +26,7 @@ function A({ href, children }: { href?: string; children: ReactNode }) {
   return (
     <a
       href={href}
-      className="underline decoration-underline underline-offset-2 transition-colors hover:decoration-foreground"
+      className="underline decoration-line underline-offset-2 transition-colors hover:decoration-foreground"
     >
       {children}
     </a>
@@ -46,7 +46,7 @@ export default function Home() {
           <p>
             I&apos;m a student at the University of Waterloo. Right now I&apos;m making{" "}
             <A href={projects[0].href}>live wallpapers for the Mac</A>
-            <br className="hidden sm:block" /> and a poker app for my friends.
+            {" "}and a poker app for my friends.
           </p>
 
           <p>
