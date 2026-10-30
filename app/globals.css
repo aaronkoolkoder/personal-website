@@ -15,8 +15,14 @@
   --font-sans: var(--font-inter);
 }
 
+/* Theme: follows the system unless the toggle pinned one via data-theme on <html>. */
+:root {
+  color-scheme: light;
+}
+
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
     --background: oklch(0.16 0.006 270);
     --foreground: oklch(0.93 0.004 270);
     --muted: oklch(0.65 0.01 270);
@@ -24,8 +30,19 @@
   }
 }
 
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --background: oklch(0.16 0.006 270);
+  --foreground: oklch(0.93 0.004 270);
+  --muted: oklch(0.65 0.01 270);
+  --line: oklch(0.38 0.01 270);
+}
+
 body {
   background: var(--background);
+  transition:
+    background-color 300ms ease,
+    color 300ms ease;
   color: var(--foreground);
   font-feature-settings: "ss01", "cv11";
 }

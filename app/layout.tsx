@@ -7,6 +7,9 @@ const inter = Inter({
   subsets: ["latin"],
 });
 
+// Runs before first paint so a pinned theme never flashes the system one.
+const themeScript = `try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}`;
+
 export const metadata: Metadata = {
   title: "Aaron Merchant",
   description: "Aaron Merchant builds software that feels good to use.",
@@ -14,7 +17,14 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${inter.variable} h-dvh overflow-hidden overscroll-none antialiased`}>
+    <html
+      lang="en"
+      className={`${inter.variable} h-dvh overflow-hidden overscroll-none antialiased`}
+      suppressHydrationWarning
+    >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body className="flex h-dvh flex-col overflow-hidden overscroll-none">
         <noscript>
           <style>{"[data-fit] { opacity: 1 !important; }"}</style>
