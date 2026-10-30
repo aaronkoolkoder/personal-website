@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import DetailDial from '../components/DetailDial.astro';
 
 const projects = [
   {
@@ -32,14 +33,7 @@ const links = [
   <main>
     <h1>Aaron Merchant</h1>
 
-    <p class="bio">
-      I'm Aaron, a student at the University of Waterloo. I make software that I'd want to use
-      myself. Lately that's been a live wallpaper engine for macOS and a poker app for my friends.
-      I like the part of a project where it goes from working to feeling good: the animation
-      timing, the empty states, the tiny details nobody asks for. I'm also learning firmware with
-      WARG, Waterloo's aerial robotics team. Before all that it was hackathons and a pile of CCC
-      and LeetCode solutions in Python. If you've read this far, say hi.
-    </p>
+    <DetailDial />
 
     <section>
       <h2>Things I've made</h2>
@@ -85,10 +79,6 @@ const links = [
     font-weight: 500;
     color: var(--muted);
     margin: 56px 0 12px;
-  }
-
-  .bio {
-    margin: 0;
   }
 
   .projects {

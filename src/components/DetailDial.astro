@@ -1,0 +1,187 @@
+---
+// Each segment shows once the dial reaches its level. Every prefix of levels
+// should still read as a complete paragraph.
+const segments: [number, string][] = [
+  [1, "I'm Aaron"],
+  [3, ', a student at the University of Waterloo'],
+  [1, '. I make software'],
+  [2, " that I'd want to use myself"],
+  [1, '.'],
+  [2, " Lately that's been a live wallpaper engine for macOS and a poker app for my friends."],
+  [
+    4,
+    ' I like the part of a project where it goes from working to feeling good: the animation timing, the empty states, the tiny details nobody asks for.',
+  ],
+  [3, " I'm also learning firmware with WARG, Waterloo's aerial robotics team."],
+  [5, ' Before all that it was hackathons and a pile of CCC and LeetCode solutions in Python.'],
+  [5, " If you've read this far, say hi."],
+];
+
+const labels = ['tl;dr', 'short', 'normal', 'long', 'everything'];
+const initial = 3;
+---
+
+<div class="dial-wrap">
+  <p class="bio" data-level={initial}>
+    {segments.map(([l, text]) => <span data-l={l}>{text}</span>)}
+  </p>
+
+  <div class="dial">
+    <label for="detail">tl;dr</label>
+    <input
+      id="detail"
+      type="range"
+      min="1"
+      max={labels.length}
+      step="1"
+      value={initial}
+      aria-label="How much detail"
+      aria-valuetext={labels[initial - 1]}
+    />
+    <label for="detail">the long version</label>
+    <span class="meta" aria-hidden="true"></span>
+  </div>
+</div>
+
+<script define:vars={{ labels }}>
+  const bio = document.querySelector('.bio');
+  const input = document.querySelector('#detail');
+  const meta = document.querySelector('.dial .meta');
+  const spans = [...bio.querySelectorAll('span')];
+  let level = Number(bio.dataset.level);
+
+  function render(next, animate) {
+    for (const s of spans) {
+      const l = Number(s.dataset.l);
+      const show = l <= next;
+      const wasShown = l <= level;
+      s.hidden = !show;
+      s.classList.toggle('in', animate && show && !wasShown);
+    }
+    level = next;
+    bio.dataset.level = String(next);
+    input.setAttribute('aria-valuetext', labels[next - 1]);
+
+    const words = spans
+      .filter((s) => !s.hidden)
+      .map((s) => s.textContent)
+      .join('')
+      .trim()
+      .split(/\s+/).length;
+    meta.textContent = `${labels[next - 1]} · ${words} words`;
+  }
+
+  input.addEventListener('input', () => render(Number(input.value), true));
+  render(level, false);
+</script>
+
+<style>
+  .bio {
+    margin: 0;
+    min-height: 1.65em;
+  }
+
+  /* No-JS fallback: hide segments above the initial level. */
+  .bio[data-level='1'] :is([data-l='2'], [data-l='3'], [data-l='4'], [data-l='5']),
+  .bio[data-level='2'] :is([data-l='3'], [data-l='4'], [data-l='5']),
+  .bio[data-level='3'] :is([data-l='4'], [data-l='5']),
+  .bio[data-level='4'] [data-l='5'] {
+    display: none;
+  }
+
+  .bio span[hidden] {
+    display: none;
+  }
+
+  .bio span.in {
+    animation: reveal 0.5s ease-out both;
+  }
+
+  @keyframes reveal {
+    from {
+      opacity: 0;
+      filter: blur(4px);
+    }
+    to {
+      opacity: 1;
+      filter: blur(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bio span.in {
+      animation-duration: 0.01s;
+    }
+  }
+
+  .dial {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 6px 12px;
+    margin-top: 24px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .dial label {
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .meta {
+    grid-column: 1 / -1;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+
+  input[type='range'] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 20px;
+    margin: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  input[type='range']::-webkit-slider-runnable-track {
+    height: 1px;
+    background: var(--line);
+  }
+
+  input[type='range']::-moz-range-track {
+    height: 1px;
+    background: var(--line);
+  }
+
+  input[type='range']::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    margin-top: -6.5px;
+    border-radius: 50%;
+    background: var(--text);
+    border: 3px solid var(--bg);
+    box-shadow: 0 0 0 1px var(--text);
+    transition: transform 0.15s;
+  }
+
+  input[type='range']::-moz-range-thumb {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--text);
+    border: 3px solid var(--bg);
+    box-shadow: 0 0 0 1px var(--text);
+  }
+
+  input[type='range']:active::-webkit-slider-thumb {
+    transform: scale(1.2);
+  }
+
+  input[type='range']:focus-visible {
+    outline: 1px dashed var(--muted);
+    outline-offset: 4px;
+  }
+</style>
