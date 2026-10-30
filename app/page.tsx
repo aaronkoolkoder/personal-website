@@ -26,7 +26,7 @@ function A({ href, children }: { href?: string; children: ReactNode }) {
   return (
     <a
       href={href}
-      className="underline decoration-line underline-offset-2 transition-colors hover:decoration-foreground"
+      className="underline decoration-[var(--line)] underline-offset-2 transition-colors hover:decoration-foreground"
     >
       {children}
     </a>
