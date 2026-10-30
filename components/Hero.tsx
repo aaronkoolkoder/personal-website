@@ -1,6 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import {
+  createContext,
+  type ReactNode,
+  use,
+  useEffect,
+  useMemo,
+  useState,
+  useSyncExternalStore,
+} from "react";
 
 // The photo is re-graded through the day: filter values and a soft-light tint
 // are interpolated between these keyframes (hour of day, 0–24).
@@ -69,13 +77,25 @@ function currentHour() {
   return now.getHours() + now.getMinutes() / 60;
 }
 
-export default function Hero() {
-  // null on the server, the visitor's local time once hydrated
+type TimeOfDay = {
+  /** null until hydrated, then the visitor's local hour (plus any scrubbing) */
+  hour: number | null;
+  touched: boolean;
+  shift: (step: number) => void;
+};
+
+const TimeContext = createContext<TimeOfDay | null>(null);
+
+function useTimeOfDay() {
+  const ctx = use(TimeContext);
+  if (!ctx) throw new Error("useTimeOfDay must be used inside <TimeProvider>");
+  return ctx;
+}
+
+export function TimeProvider({ children }: { children: ReactNode }) {
   const now = useSyncExternalStore(noopSubscribe, currentHour, () => null);
   const [offset, setOffset] = useState(0);
   const [touched, setTouched] = useState(false);
-  const [loaded, setLoaded] = useState(false);
-  const hour = now === null ? null : now + offset;
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -91,21 +111,35 @@ export default function Hero() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
+  const value = useMemo<TimeOfDay>(
+    () => ({
+      hour: now === null ? null : now + offset,
+      touched,
+      shift: (step) => {
+        setTouched(true);
+        setOffset((o) => o + step);
+      },
+    }),
+    [now, offset, touched],
+  );
+
+  return <TimeContext value={value}>{children}</TimeContext>;
+}
+
+export default function Hero() {
+  const { hour, shift } = useTimeOfDay();
+  const [loaded, setLoaded] = useState(false);
+
   const g = useMemo(() => gradeAt(hour ?? 12), [hour]);
   const ready = hour !== null;
   const shown = ready && loaded;
 
-  const shift = (step: number) => {
-    setTouched(true);
-    setOffset((o) => o + step);
-  };
-
   return (
-    <div className="relative">
+    <div className="relative shrink-0">
       <div
         aria-hidden="true"
         onClick={() => shift(2)}
-        className="relative -mb-14 h-[clamp(220px,32vw,380px)] w-full overflow-hidden hero-fade sm:pointer-events-none"
+        className="relative -mb-14 h-[min(clamp(220px,32vw,380px),38dvh)] w-full overflow-hidden hero-fade sm:pointer-events-none"
       >
         {/* Opening: the scene washes in from the page colour, soft and slightly zoomed, then settles. */}
         <div
@@ -156,21 +190,27 @@ export default function Hero() {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
 
-      <div className="absolute top-2 right-3 hidden text-center font-mono text-[10px] tracking-wide text-white/60 select-none sm:block">
-        <div>
-          <button onClick={() => shift(-1)} className="px-1 transition-colors hover:text-white" aria-label="Earlier">
-            ←
-          </button>
-          h · l
-          <button onClick={() => shift(1)} className="px-1 transition-colors hover:text-white" aria-label="Later">
-            →
-          </button>
-        </div>
-        <div className={`transition-opacity duration-500 ${touched ? "opacity-100" : "opacity-0"}`} aria-live="polite">
-          {ready ? formatHour(hour) : ""}
-        </div>
-      </div>
+export function TimeControl() {
+  const { hour, touched, shift } = useTimeOfDay();
+
+  return (
+    <div className="flex items-center gap-3 font-mono text-[11px] tracking-wide text-muted select-none">
+      <span>
+        <button onClick={() => shift(-1)} className="pr-1 transition-colors hover:text-foreground" aria-label="Earlier">
+          ←
+        </button>
+        h · l
+        <button onClick={() => shift(1)} className="pl-1 transition-colors hover:text-foreground" aria-label="Later">
+          →
+        </button>
+      </span>
+      <span className={`transition-opacity duration-500 ${touched ? "opacity-100" : "opacity-0"}`} aria-live="polite">
+        {hour !== null ? formatHour(hour) : ""}
+      </span>
     </div>
   );
 }

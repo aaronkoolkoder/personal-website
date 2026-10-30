@@ -1,4 +1,4 @@
-import Hero from "@/components/Hero";
+import Hero, { TimeControl, TimeProvider } from "@/components/Hero";
 import type { ReactNode } from "react";
 
 const projects = [
@@ -35,12 +35,12 @@ function A({ href, children }: { href?: string; children: ReactNode }) {
 
 export default function Home() {
   return (
-    <>
+    <TimeProvider>
       <Hero />
-      <main className="relative mx-auto max-w-[36rem] px-4 pb-24 text-base leading-6">
-        <h1 className="mb-6 text-xl font-medium tracking-tight">Aaron Merchant</h1>
+      <main className="relative mx-auto w-full max-w-[36rem] px-4 pb-6 text-base leading-6">
+        <h1 className="mb-[clamp(0.75rem,2.6dvh,1.5rem)] text-xl font-medium tracking-tight">Aaron Merchant</h1>
 
-        <div className="space-y-6">
+        <div className="space-y-[clamp(0.75rem,2.6dvh,1.5rem)]">
           <p>I like building software that feels good to use.</p>
 
           <p>
@@ -65,15 +65,17 @@ export default function Home() {
             </ul>
           </div>
 
-          <nav className="flex gap-5 pt-2">
+          <nav className="flex gap-5">
             {links.map((l) => (
               <A key={l.label} href={l.href}>
                 {l.label}
               </A>
             ))}
           </nav>
+
+          <TimeControl />
         </div>
       </main>
-    </>
+    </TimeProvider>
   );
 }

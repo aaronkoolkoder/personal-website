@@ -14,8 +14,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${inter.variable} antialiased`}>
-      <body>{children}</body>
+    <html lang="en" className={`${inter.variable} h-dvh overflow-hidden overscroll-none antialiased`}>
+      <body className="flex h-dvh flex-col overflow-hidden overscroll-none">{children}</body>
     </html>
   );
 }
