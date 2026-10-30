@@ -1,5 +1,6 @@
 import FitToScreen from "@/components/FitToScreen";
 import Hero, { TimeControl, TimeProvider } from "@/components/Hero";
+import ThemeToggle from "@/components/ThemeToggle";
 import type { ReactNode } from "react";
 
 const projects = [
@@ -19,7 +20,10 @@ const projects = [
 
 const links = [
   { label: "GitHub", href: "https://github.com/aaronkoolkoder" },
-  // TODO: Email, LinkedIn, Resume
+  // TODO: replace with your profile URL
+  { label: "LinkedIn", href: "https://www.linkedin.com/" },
+  // drop resume.pdf into /public
+  { label: "Resume", href: "/resume.pdf" },
 ];
 
 function A({ href, children }: { href?: string; children: ReactNode }) {
@@ -74,7 +78,12 @@ export default function Home() {
             ))}
           </nav>
 
-          <TimeControl />
+          <div className="flex items-center justify-between">
+            <TimeControl />
+            <div className="text-[0.8em] text-muted">
+              <ThemeToggle />
+            </div>
+          </div>
         </div>
       </FitToScreen>
     </TimeProvider>
