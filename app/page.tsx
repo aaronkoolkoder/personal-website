@@ -1,5 +1,5 @@
 import FitToScreen from "@/components/FitToScreen";
-import Hero, { TimeControl, TimeProvider } from "@/components/Hero";
+import Hero, { Clock } from "@/components/Hero";
 import ThemeToggle from "@/components/ThemeToggle";
 import type { ReactNode } from "react";
 
@@ -40,7 +40,7 @@ function A({ href, children }: { href?: string; children: ReactNode }) {
 
 export default function Home() {
   return (
-    <TimeProvider>
+    <>
       <Hero />
       <FitToScreen>
         <h1 className="mb-[clamp(0.6em,2dvh,1.5em)] text-[1.25em] font-medium tracking-tight">Aaron Merchant</h1>
@@ -78,14 +78,12 @@ export default function Home() {
             ))}
           </nav>
 
-          <div className="flex items-center justify-between">
-            <TimeControl />
-            <div className="text-[0.8em] text-muted">
-              <ThemeToggle />
-            </div>
+          <div className="flex min-h-[1.6em] items-center justify-between text-[0.8em] text-muted">
+            <Clock />
+            <ThemeToggle />
           </div>
         </div>
       </FitToScreen>
-    </TimeProvider>
+    </>
   );
 }

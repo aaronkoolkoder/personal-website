@@ -1,15 +1,7 @@
 "use client";
 
-import {
-  createContext,
-  type ReactNode,
-  use,
-  useEffect,
-  useMemo,
-  useState,
-  useSyncExternalStore,
-} from "react";
-import { ChevronLeft, ChevronRight, Moon, Sun, Sunrise, Sunset } from "lucide-react";
+import { Moon, Sun, Sunrise, Sunset } from "lucide-react";
+import { useMemo, useState, useSyncExternalStore } from "react";
 
 // The photo is re-graded through the day: filter values and a soft-light tint
 // are interpolated between these keyframes (hour of day, 0–24).
@@ -54,13 +46,6 @@ function gradeAt(hour: number): Grade {
   };
 }
 
-function formatHour(hour: number) {
-  const h = ((hour % 24) + 24) % 24;
-  const mins = Math.round((h % 1) * 60);
-  const h12 = Math.floor(h) % 12 || 12;
-  return `${h12}:${String(mins).padStart(2, "0")} ${h < 12 ? "am" : "pm"}`;
-}
-
 // Fixed pseudo-random star field so server and client markup match.
 const STARS = Array.from({ length: 70 }, (_, i) => {
   const r = (n: number) => {
@@ -71,59 +56,31 @@ const STARS = Array.from({ length: 70 }, (_, i) => {
   return { x: round(r(1) * 100), y: round(r(2) * 42), size: r(3) < 0.85 ? 1 : 2, delay: round(r(4) * 6) };
 });
 
-const noopSubscribe = () => () => {};
+// Local time as fractional hours, refreshed every 15s. The snapshot only
+// changes once a minute, so it stays stable between renders.
+function subscribeToClock(onChange: () => void) {
+  const id = setInterval(onChange, 15_000);
+  return () => clearInterval(id);
+}
 
 function currentHour() {
   const now = new Date();
   return now.getHours() + now.getMinutes() / 60;
 }
 
-type TimeOfDay = {
-  /** null until hydrated, then the visitor's local hour (plus any scrubbing) */
-  hour: number | null;
-  shift: (step: number) => void;
-};
-
-const TimeContext = createContext<TimeOfDay | null>(null);
-
-function useTimeOfDay() {
-  const ctx = use(TimeContext);
-  if (!ctx) throw new Error("useTimeOfDay must be used inside <TimeProvider>");
-  return ctx;
+/** null on the server, the visitor's local hour once hydrated */
+function useLocalHour() {
+  return useSyncExternalStore(subscribeToClock, currentHour, () => null);
 }
 
-export function TimeProvider({ children }: { children: ReactNode }) {
-  const now = useSyncExternalStore(noopSubscribe, currentHour, () => null);
-  const [offset, setOffset] = useState(0);
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.metaKey || e.ctrlKey || e.altKey) return;
-      const target = e.target as HTMLElement;
-      if (target.isContentEditable || ["INPUT", "TEXTAREA"].includes(target.tagName)) return;
-      const step = e.key === "h" || e.key === "ArrowLeft" ? -1 : e.key === "l" || e.key === "ArrowRight" ? 1 : 0;
-      if (!step) return;
-      setOffset((o) => o + step);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
-
-  const value = useMemo<TimeOfDay>(
-    () => ({
-      hour: now === null ? null : now + offset,
-      shift: (step) => {
-        setOffset((o) => o + step);
-      },
-    }),
-    [now, offset],
-  );
-
-  return <TimeContext value={value}>{children}</TimeContext>;
+function formatHour(hour: number) {
+  const mins = Math.round((hour % 1) * 60);
+  const h12 = Math.floor(hour) % 12 || 12;
+  return `${h12}:${String(mins).padStart(2, "0")} ${hour < 12 ? "am" : "pm"}`;
 }
 
 export default function Hero() {
-  const { hour, shift } = useTimeOfDay();
+  const hour = useLocalHour();
   const [loaded, setLoaded] = useState(false);
 
   const g = useMemo(() => gradeAt(hour ?? 12), [hour]);
@@ -134,8 +91,7 @@ export default function Hero() {
     <div className="relative shrink-0">
       <div
         aria-hidden="true"
-        onClick={() => shift(2)}
-        className="relative -mb-14 h-[min(clamp(150px,32vw,380px),34dvh)] w-full overflow-hidden hero-fade sm:pointer-events-none"
+        className="relative -mb-14 h-[min(clamp(150px,32vw,380px),34dvh)] w-full overflow-hidden hero-fade pointer-events-none"
       >
         {/* Opening: the scene washes in from the page colour, soft and slightly zoomed, then settles. */}
         <div
@@ -190,34 +146,24 @@ export default function Hero() {
   );
 }
 
-function PhaseIcon({ hour }: { hour: number }) {
-  const h = ((hour % 24) + 24) % 24;
-  const [phase, Icon] =
-    h >= 5 && h < 8 ? ["sunrise", Sunrise] : h >= 8 && h < 17 ? ["day", Sun] : h >= 17 && h < 20 ? ["sunset", Sunset] : ["night", Moon];
-  return <Icon key={phase} className="size-[1.1em] animate-[fade-in_400ms_ease-out]" strokeWidth={1.75} />;
-}
+export function Clock() {
+  const hour = useLocalHour();
+  // keep the slot so the theme button stays put before hydration
+  if (hour === null) return <span />;
 
-export function TimeControl() {
-  const { hour, shift } = useTimeOfDay();
-  const button =
-    "grid size-[1.6em] place-items-center rounded-full transition-colors hover:bg-foreground/5 hover:text-foreground active:scale-90";
+  const [phase, Icon] =
+    hour >= 5 && hour < 8
+      ? ["sunrise", Sunrise]
+      : hour >= 8 && hour < 17
+        ? ["day", Sun]
+        : hour >= 17 && hour < 20
+          ? ["sunset", Sunset]
+          : ["night", Moon];
 
   return (
-    <div className="flex items-center gap-[0.15em] text-[0.8em] text-muted select-none" title="Tip: press h / l">
-      <button onClick={() => shift(-1)} className={button} aria-label="An hour earlier">
-        <ChevronLeft className="size-[1em]" strokeWidth={2} />
-      </button>
-      <span className="flex min-w-[5.5em] items-center justify-center gap-[0.4em] tabular-nums" aria-live="polite">
-        {hour !== null && (
-          <>
-            <PhaseIcon hour={hour} />
-            {formatHour(hour)}
-          </>
-        )}
-      </span>
-      <button onClick={() => shift(1)} className={button} aria-label="An hour later">
-        <ChevronRight className="size-[1em]" strokeWidth={2} />
-      </button>
-    </div>
+    <span className="flex items-center gap-[0.4em] tabular-nums">
+      <Icon key={phase} className="size-[1.1em] animate-[fade-in_400ms_ease-out]" strokeWidth={1.75} />
+      {formatHour(hour)}
+    </span>
   );
 }

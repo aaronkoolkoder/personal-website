@@ -2,7 +2,6 @@
 
 One page, no scrolling: a mountain banner that follows the visitor's time of day, then a short bio.
 
-- `h` / `l` (or the arrows under the links) scrub the scene through the day
 - the theme button cycles system → light → dark and remembers the choice
 - text sizes itself to fit any screen
 
