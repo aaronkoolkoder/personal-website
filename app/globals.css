@@ -62,6 +62,13 @@ body {
   }
 }
 
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.6) rotate(-30deg);
+  }
+}
+
 @keyframes twinkle {
   0%,
   100% {

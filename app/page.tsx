@@ -1,3 +1,4 @@
+import FitToScreen from "@/components/FitToScreen";
 import Hero, { TimeControl, TimeProvider } from "@/components/Hero";
 import type { ReactNode } from "react";
 
@@ -37,10 +38,10 @@ export default function Home() {
   return (
     <TimeProvider>
       <Hero />
-      <main className="relative mx-auto w-full max-w-[36rem] px-4 pb-6 text-base leading-6">
-        <h1 className="mb-[clamp(0.75rem,2.6dvh,1.5rem)] text-xl font-medium tracking-tight">Aaron Merchant</h1>
+      <FitToScreen>
+        <h1 className="mb-[clamp(0.6em,2dvh,1.5em)] text-[1.25em] font-medium tracking-tight">Aaron Merchant</h1>
 
-        <div className="space-y-[clamp(0.75rem,2.6dvh,1.5rem)]">
+        <div className="space-y-[clamp(0.6em,2dvh,1.5em)]">
           <p>I like building software that feels good to use.</p>
 
           <p>
@@ -56,7 +57,7 @@ export default function Home() {
 
           <div>
             <p>A few projects I&apos;ve loved working on:</p>
-            <ul className="mt-1 list-disc space-y-1 pl-5 marker:text-muted">
+            <ul className="mt-[0.25em] list-disc space-y-[0.25em] pl-[1.25em] marker:text-muted">
               {projects.map((p) => (
                 <li key={p.name}>
                   <A href={p.href}>{p.name}</A> <span className="text-muted">-</span> {p.blurb}
@@ -65,7 +66,7 @@ export default function Home() {
             </ul>
           </div>
 
-          <nav className="flex gap-5">
+          <nav className="flex gap-[1.25em]">
             {links.map((l) => (
               <A key={l.label} href={l.href}>
                 {l.label}
@@ -75,7 +76,7 @@ export default function Home() {
 
           <TimeControl />
         </div>
-      </main>
+      </FitToScreen>
     </TimeProvider>
   );
 }

@@ -9,6 +9,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
+import { ChevronLeft, ChevronRight, Moon, Sun, Sunrise, Sunset } from "lucide-react";
 
 // The photo is re-graded through the day: filter values and a soft-light tint
 // are interpolated between these keyframes (hour of day, 0–24).
@@ -80,7 +81,6 @@ function currentHour() {
 type TimeOfDay = {
   /** null until hydrated, then the visitor's local hour (plus any scrubbing) */
   hour: number | null;
-  touched: boolean;
   shift: (step: number) => void;
 };
 
@@ -95,7 +95,6 @@ function useTimeOfDay() {
 export function TimeProvider({ children }: { children: ReactNode }) {
   const now = useSyncExternalStore(noopSubscribe, currentHour, () => null);
   const [offset, setOffset] = useState(0);
-  const [touched, setTouched] = useState(false);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -104,7 +103,6 @@ export function TimeProvider({ children }: { children: ReactNode }) {
       if (target.isContentEditable || ["INPUT", "TEXTAREA"].includes(target.tagName)) return;
       const step = e.key === "h" || e.key === "ArrowLeft" ? -1 : e.key === "l" || e.key === "ArrowRight" ? 1 : 0;
       if (!step) return;
-      setTouched(true);
       setOffset((o) => o + step);
     };
     window.addEventListener("keydown", onKey);
@@ -114,13 +112,11 @@ export function TimeProvider({ children }: { children: ReactNode }) {
   const value = useMemo<TimeOfDay>(
     () => ({
       hour: now === null ? null : now + offset,
-      touched,
       shift: (step) => {
-        setTouched(true);
         setOffset((o) => o + step);
       },
     }),
-    [now, offset, touched],
+    [now, offset],
   );
 
   return <TimeContext value={value}>{children}</TimeContext>;
@@ -139,7 +135,7 @@ export default function Hero() {
       <div
         aria-hidden="true"
         onClick={() => shift(2)}
-        className="relative -mb-14 h-[min(clamp(220px,32vw,380px),38dvh)] w-full overflow-hidden hero-fade sm:pointer-events-none"
+        className="relative -mb-14 h-[min(clamp(150px,32vw,380px),34dvh)] w-full overflow-hidden hero-fade sm:pointer-events-none"
       >
         {/* Opening: the scene washes in from the page colour, soft and slightly zoomed, then settles. */}
         <div
@@ -194,23 +190,34 @@ export default function Hero() {
   );
 }
 
+function PhaseIcon({ hour }: { hour: number }) {
+  const h = ((hour % 24) + 24) % 24;
+  const [phase, Icon] =
+    h >= 5 && h < 8 ? ["sunrise", Sunrise] : h >= 8 && h < 17 ? ["day", Sun] : h >= 17 && h < 20 ? ["sunset", Sunset] : ["night", Moon];
+  return <Icon key={phase} className="size-[1.1em] animate-[fade-in_400ms_ease-out]" strokeWidth={1.75} />;
+}
+
 export function TimeControl() {
-  const { hour, touched, shift } = useTimeOfDay();
+  const { hour, shift } = useTimeOfDay();
+  const button =
+    "grid size-[1.6em] place-items-center rounded-full transition-colors hover:bg-foreground/5 hover:text-foreground active:scale-90";
 
   return (
-    <div className="flex items-center gap-3 font-mono text-[11px] tracking-wide text-muted select-none">
-      <span>
-        <button onClick={() => shift(-1)} className="pr-1 transition-colors hover:text-foreground" aria-label="Earlier">
-          ←
-        </button>
-        h · l
-        <button onClick={() => shift(1)} className="pl-1 transition-colors hover:text-foreground" aria-label="Later">
-          →
-        </button>
+    <div className="flex items-center gap-[0.15em] text-[0.8em] text-muted select-none" title="Tip: press h / l">
+      <button onClick={() => shift(-1)} className={button} aria-label="An hour earlier">
+        <ChevronLeft className="size-[1em]" strokeWidth={2} />
+      </button>
+      <span className="flex min-w-[5.5em] items-center justify-center gap-[0.4em] tabular-nums" aria-live="polite">
+        {hour !== null && (
+          <>
+            <PhaseIcon hour={hour} />
+            {formatHour(hour)}
+          </>
+        )}
       </span>
-      <span className={`transition-opacity duration-500 ${touched ? "opacity-100" : "opacity-0"}`} aria-live="polite">
-        {hour !== null ? formatHour(hour) : ""}
-      </span>
+      <button onClick={() => shift(1)} className={button} aria-label="An hour later">
+        <ChevronRight className="size-[1em]" strokeWidth={2} />
+      </button>
     </div>
   );
 }
