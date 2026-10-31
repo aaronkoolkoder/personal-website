@@ -1,5 +1,6 @@
 "use client";
 
+import { asset } from "@/lib/asset";
 import { Moon, Sun, Sunrise, Sunset } from "lucide-react";
 import { useMemo, useState, useSyncExternalStore } from "react";
 
@@ -117,7 +118,7 @@ export default function Hero() {
                 if (img?.complete) setLoaded(true);
               }}
               onLoad={() => setLoaded(true)}
-              src="/mountains.webp"
+              src={asset("/mountains.webp")}
               alt=""
               fetchPriority="high"
               className="absolute inset-0 h-full w-full object-cover object-[50%_22%] transition-[filter] duration-700 ease-out"

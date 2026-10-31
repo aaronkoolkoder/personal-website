@@ -1,4 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
+import { asset } from "@/lib/asset";
 import type { ReactNode } from "react";
 
 // An organisation shown inline as a small logo + name pill.
@@ -20,7 +21,7 @@ export default function Chip({
       className="inline-flex items-center gap-[0.35em] rounded-[5px] bg-[var(--chip)] py-[0.05em] pr-[0.45em] pl-[0.25em] align-baseline leading-[1.35] whitespace-nowrap transition-colors hover:bg-[var(--chip-hover)]"
     >
       <img
-        src={logo}
+        src={asset(logo)}
         alt=""
         width={16}
         height={16}

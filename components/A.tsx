@@ -1,3 +1,4 @@
+import { asset } from "@/lib/asset";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -18,7 +19,7 @@ export default function A({ href, children }: { href?: string; children: ReactNo
     );
   }
   return (
-    <a href={href} className={style} {...(isFile ? { target: "_blank", rel: "noopener" } : {})}>
+    <a href={isFile ? asset(href) : href} className={style} {...(isFile ? { target: "_blank", rel: "noopener" } : {})}>
       {children}
     </a>
   );

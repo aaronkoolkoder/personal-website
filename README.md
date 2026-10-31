@@ -12,3 +12,7 @@ npm run dev
 ```
 
 Copy lives in `app/page.tsx`, projects in `lib/projects.ts`. Replace `public/resume.pdf` to update the resume.
+
+## Deploying
+
+Every push to `main` builds a static export (`out/`) and publishes it to GitHub Pages via `.github/workflows/pages.yml`. Asset paths in `<img>`/`<a>` tags go through `asset()` in `lib/asset.ts` so they pick up the Pages base path.

@@ -1,6 +1,7 @@
 "use client";
 
 import A from "@/components/A";
+import { asset } from "@/lib/asset";
 import type { Project } from "@/lib/projects";
 import { ImageIcon, Search, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -28,7 +29,7 @@ function ProjectImage({ project }: { project: Project }) {
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={project.image}
+      src={asset(project.image)}
       alt={`${project.name} screenshot`}
       loading="lazy"
       className={`${frame} border border-[var(--line)] bg-[var(--chip)] object-cover`}
