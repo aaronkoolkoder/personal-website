@@ -9,6 +9,8 @@ export type Project = {
   href?: string;
   /** label for the link on the projects page */
   linkLabel?: string;
+  /** screenshot in /public/projects, e.g. "/projects/diorama.png" (16:10 works best) */
+  image?: string;
 };
 
 export const projects: Project[] = [

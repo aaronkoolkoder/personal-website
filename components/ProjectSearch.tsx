@@ -2,12 +2,38 @@
 
 import A from "@/components/A";
 import type { Project } from "@/lib/projects";
-import { Search, X } from "lucide-react";
+import { ImageIcon, Search, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 function matches(p: Project, words: string[]) {
   const haystack = [p.name, p.blurb, p.details, ...p.tags].join(" ").toLowerCase();
   return words.every((w) => haystack.includes(w));
+}
+
+function ProjectImage({ project }: { project: Project }) {
+  const frame = "aspect-[16/10] w-full overflow-hidden rounded-lg";
+
+  if (!project.image) {
+    // Empty slot until a screenshot is added in lib/projects.ts
+    return (
+      <div
+        className={`${frame} grid place-items-center border border-dashed border-[var(--line)] bg-[var(--chip)] text-muted`}
+        aria-hidden
+      >
+        <ImageIcon className="size-[1.25em] opacity-60" strokeWidth={1.5} />
+      </div>
+    );
+  }
+
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={project.image}
+      alt={`${project.name} screenshot`}
+      loading="lazy"
+      className={`${frame} border border-[var(--line)] bg-[var(--chip)] object-cover`}
+    />
+  );
 }
 
 export default function ProjectSearch({ projects }: { projects: Project[] }) {
@@ -82,14 +108,19 @@ export default function ProjectSearch({ projects }: { projects: Project[] }) {
               id={p.id}
               className="scroll-mt-8 border-t border-[var(--line)] py-[1.25em] target:animate-[highlight_2s_ease-out]"
             >
-              <h2 className="font-medium">{p.name}</h2>
-              <p className="mt-[0.25em] text-foreground/85">{p.details}</p>
-              <p className="mt-[0.5em] text-[0.9em] text-muted">{p.tags.join(", ")}</p>
-              {p.href && (
-                <p className="mt-[0.5em]">
-                  <A href={p.href}>{p.linkLabel ?? "link"}</A>
-                </p>
-              )}
+              <div className="grid gap-[1em] sm:grid-cols-[11rem_1fr] sm:gap-[1.25em]">
+                <ProjectImage project={p} />
+                <div>
+                  <h2 className="font-medium">{p.name}</h2>
+                  <p className="mt-[0.25em] text-foreground/85">{p.details}</p>
+                  <p className="mt-[0.5em] text-[0.9em] text-muted">{p.tags.join(", ")}</p>
+                  {p.href && (
+                    <p className="mt-[0.5em]">
+                      <A href={p.href}>{p.linkLabel ?? "link"}</A>
+                    </p>
+                  )}
+                </div>
+              </div>
             </li>
           ))}
         </ul>
