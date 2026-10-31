@@ -1,21 +1,10 @@
+import A from "@/components/A";
+import Chip from "@/components/Chip";
 import FitToScreen from "@/components/FitToScreen";
 import Hero, { Clock } from "@/components/Hero";
+import SiteNav from "@/components/SiteNav";
 import ThemeToggle from "@/components/ThemeToggle";
-import type { ReactNode } from "react";
-
-const projects = [
-  {
-    name: "Diorama",
-    href: "https://github.com/aaronkoolkoder/wallpaperapp",
-    blurb: "live wallpapers for macOS, rendered in Metal at under 0.5% CPU",
-  },
-  { name: "Targeting drone", blurb: "a quadcopter that finds and tracks targets on its own" },
-  {
-    name: "Extrovert AI",
-    href: "https://github.com/aaronkoolkoder/Extrovert-AI",
-    blurb: "rehearse interviews and pitches with AI video personas",
-  },
-];
+import { featured } from "@/lib/projects";
 
 const links = [
   { label: "GitHub", href: "https://github.com/aaronkoolkoder" },
@@ -25,51 +14,55 @@ const links = [
   { label: "Resume", href: "/resume.pdf" },
 ];
 
-function A({ href, children }: { href?: string; children: ReactNode }) {
-  if (!href) return <span>{children}</span>;
-  return (
-    <a
-      href={href}
-      className="underline decoration-[var(--line)] underline-offset-2 transition-colors hover:decoration-foreground"
-    >
-      {children}
-    </a>
-  );
-}
-
 export default function Home() {
   return (
-    <>
+    <div className="flex h-dvh flex-col overflow-hidden">
       <Hero />
       <FitToScreen>
-        <h1 className="mb-[clamp(0.6em,2dvh,1.5em)] text-[1.25em] font-medium tracking-tight">Aaron Merchant</h1>
+        <header className="mb-[clamp(0.6em,2dvh,1.5em)] flex items-baseline justify-between gap-4">
+          <h1 className="text-[1.25em] font-medium tracking-tight">Aaron Merchant</h1>
+          <SiteNav active="home" />
+        </header>
 
         <div className="space-y-[clamp(0.6em,2dvh,1.5em)]">
+          <p>I&apos;m interested in machine learning and software that runs close to hardware.</p>
+
           <p>
-            I&apos;m interested in software that leaves the screen: drones, flight controllers, and
-            the code that keeps them in the air.
+            I study Computer Engineering @{" "}
+            <Chip href="https://uwaterloo.ca" logo="/logos/waterloo.png">
+              University of Waterloo
+            </Chip>{" "}
+            and I&apos;m currently an Embedded Software Developer @{" "}
+            <Chip href="https://www.uwarg.com" logo="/logos/uwarg.png" invertInDark>
+              UWARG
+            </Chip>
+            .
           </p>
 
           <p>
-            I study Computer Engineering at Waterloo and write flight software at{" "}
-            <A href="https://www.uwarg.com">WARG</A>, where I&apos;m building the test rig that runs our
-            autopilot against simulated flights before it ever leaves the ground.
-          </p>
-
-          <p>
-            This summer I co-founded a small game studio. Our game Seal A Driveway hit 7.2M plays and
-            11K players at once before it was acquired.
+            This summer I co-founded the game development company{" "}
+            <Chip
+              href="https://www.roblox.com/communities/261071327/Lunate-Studios#!/about"
+              logo="/logos/lunate.png"
+            >
+              Lunate Studios
+            </Chip>
+            . We developed 2 games, with one reaching 7.2M plays and 11K CCU before getting acquired.
           </p>
 
           <div>
-            <p>A few projects I&apos;ve loved working on:</p>
+            <p>Projects I did include:</p>
             <ul className="mt-[0.25em] list-disc space-y-[0.25em] pl-[1.25em] marker:text-muted">
-              {projects.map((p) => (
-                <li key={p.name}>
-                  <A href={p.href}>{p.name}</A> <span className="text-muted">-</span> {p.blurb}
+              {featured.map((p) => (
+                <li key={p.id}>
+                  <A href={`/projects#${p.id}`}>{p.name}</A> <span className="text-muted">-</span>{" "}
+                  {p.blurb}
                 </li>
               ))}
             </ul>
+            <p className="mt-[0.25em]">
+              <A href="/projects">All projects →</A>
+            </p>
           </div>
 
           <nav className="flex gap-[1.25em]">
@@ -86,6 +79,6 @@ export default function Home() {
           </div>
         </div>
       </FitToScreen>
-    </>
+    </div>
   );
 }

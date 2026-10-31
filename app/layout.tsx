@@ -20,10 +20,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${inter.variable} h-dvh overflow-hidden overscroll-none antialiased`}
+      className={`${inter.variable} overscroll-none antialiased`}
       suppressHydrationWarning
     >
-      <body className="flex h-dvh flex-col overflow-hidden overscroll-none">
+      <body>
         <Script id="theme" strategy="beforeInteractive">
           {themeScript}
         </Script>
