@@ -7,14 +7,13 @@ const projects = [
   {
     name: "Diorama",
     href: "https://github.com/aaronkoolkoder/wallpaperapp",
-    blurb: "a native macOS wallpaper engine built on Metal",
+    blurb: "live wallpapers for macOS, rendered in Metal at under 0.5% CPU",
   },
-  { name: "Targeting drone", blurb: "an autonomous quadcopter that tracks targets with OpenCV" },
-  { name: "Seal A Driveway", blurb: "a multiplayer game with 7.2M+ plays" },
+  { name: "Targeting drone", blurb: "a quadcopter that finds and tracks targets on its own" },
   {
     name: "Extrovert AI",
     href: "https://github.com/aaronkoolkoder/Extrovert-AI",
-    blurb: "practice conversations with AI video personas",
+    blurb: "rehearse interviews and pitches with AI video personas",
   },
 ];
 
@@ -46,17 +45,20 @@ export default function Home() {
         <h1 className="mb-[clamp(0.6em,2dvh,1.5em)] text-[1.25em] font-medium tracking-tight">Aaron Merchant</h1>
 
         <div className="space-y-[clamp(0.6em,2dvh,1.5em)]">
-          <p>I like building software that runs on real hardware.</p>
-
           <p>
-            I study Computer Engineering at Waterloo. I&apos;m currently building hardware-in-the-loop
-            testing for ZeroPilot, the open-source autopilot at{" "}
-            <A href="https://www.uwarg.com">WARG</A>.
+            I&apos;m interested in software that leaves the screen: drones, flight controllers, and
+            the code that keeps them in the air.
           </p>
 
           <p>
-            Before that I co-founded Lunate Studios and shipped 4 multiplayer games, and spent a summer
-            at IQC&apos;s Quantum School modelling qubits with linear algebra.
+            I study Computer Engineering at Waterloo and write flight software at{" "}
+            <A href="https://www.uwarg.com">WARG</A>, where I&apos;m building the test rig that runs our
+            autopilot against simulated flights before it ever leaves the ground.
+          </p>
+
+          <p>
+            This summer I co-founded a small game studio. Our game Seal A Driveway hit 7.2M plays and
+            11K players at once before it was acquired.
           </p>
 
           <div>
