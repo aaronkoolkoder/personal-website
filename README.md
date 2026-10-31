@@ -1,8 +1,8 @@
 # personal website
 
-One page, no scrolling: a mountain banner that follows the visitor's time of day, then a short bio.
+One page, no scrolling: a mountain banner that follows the time of day in Waterloo, then a short bio.
 
-- the theme button cycles system → light → dark and remembers the choice
+- follows the system theme until the sun/moon button is clicked, then remembers the choice
 - text sizes itself to fit any screen
 
 Built with Next.js and Tailwind.

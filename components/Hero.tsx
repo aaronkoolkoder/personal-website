@@ -56,20 +56,28 @@ const STARS = Array.from({ length: 70 }, (_, i) => {
   return { x: round(r(1) * 100), y: round(r(2) * 42), size: r(3) < 0.85 ? 1 : 2, delay: round(r(4) * 6) };
 });
 
-// Local time as fractional hours, refreshed every 15s. The snapshot only
+// Waterloo's time as fractional hours, refreshed every 15s. The snapshot only
 // changes once a minute, so it stays stable between renders.
 function subscribeToClock(onChange: () => void) {
   const id = setInterval(onChange, 15_000);
   return () => clearInterval(id);
 }
 
+const waterlooTime = new Intl.DateTimeFormat("en-US", {
+  timeZone: "America/Toronto",
+  hour: "numeric",
+  minute: "numeric",
+  hourCycle: "h23",
+});
+
 function currentHour() {
-  const now = new Date();
-  return now.getHours() + now.getMinutes() / 60;
+  const parts = waterlooTime.formatToParts(new Date());
+  const get = (type: string) => Number(parts.find((p) => p.type === type)?.value);
+  return get("hour") + get("minute") / 60;
 }
 
-/** null on the server, the visitor's local hour once hydrated */
-function useLocalHour() {
+/** null on the server, Waterloo's hour once hydrated */
+function useWaterlooHour() {
   return useSyncExternalStore(subscribeToClock, currentHour, () => null);
 }
 
@@ -80,7 +88,7 @@ function formatHour(hour: number) {
 }
 
 export default function Hero() {
-  const hour = useLocalHour();
+  const hour = useWaterlooHour();
   const [loaded, setLoaded] = useState(false);
 
   const g = useMemo(() => gradeAt(hour ?? 12), [hour]);
@@ -147,7 +155,7 @@ export default function Hero() {
 }
 
 export function Clock() {
-  const hour = useLocalHour();
+  const hour = useWaterlooHour();
   // keep the slot so the theme button stays put before hydration
   if (hour === null) return <span />;
 
@@ -163,7 +171,7 @@ export function Clock() {
   return (
     <span className="flex items-center gap-[0.4em] tabular-nums">
       <Icon key={phase} className="size-[1.1em] animate-[fade-in_400ms_ease-out]" strokeWidth={1.75} />
-      {formatHour(hour)}
+      {formatHour(hour)} in Waterloo
     </span>
   );
 }
