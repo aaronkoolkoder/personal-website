@@ -1,57 +1,63 @@
 "use client";
 
-import { Monitor, Moon, Sun } from "lucide-react";
+import { Moon, Sun } from "lucide-react";
 import { useSyncExternalStore } from "react";
 
-type Theme = "system" | "light" | "dark";
+type Theme = "light" | "dark";
 
-const ORDER: Theme[] = ["system", "light", "dark"];
-const ICONS = { system: Monitor, light: Sun, dark: Moon };
 const EVENT = "themechange";
+const darkQuery = () => window.matchMedia("(prefers-color-scheme: dark)");
 
-function readTheme(): Theme {
+function storedTheme(): Theme | null {
   try {
     const t = localStorage.getItem("theme");
-    return t === "light" || t === "dark" ? t : "system";
+    return t === "light" || t === "dark" ? t : null;
   } catch {
-    return "system";
+    return null;
   }
 }
 
+// What's actually on screen: the pinned choice, else whatever the system says.
+function resolvedTheme(): Theme {
+  return storedTheme() ?? (darkQuery().matches ? "dark" : "light");
+}
+
 function subscribe(onChange: () => void) {
+  const media = darkQuery();
   window.addEventListener(EVENT, onChange);
   window.addEventListener("storage", onChange);
+  media.addEventListener("change", onChange);
   return () => {
     window.removeEventListener(EVENT, onChange);
     window.removeEventListener("storage", onChange);
+    media.removeEventListener("change", onChange);
   };
 }
 
 function applyTheme(theme: Theme) {
   try {
-    if (theme === "system") localStorage.removeItem("theme");
-    else localStorage.setItem("theme", theme);
+    localStorage.setItem("theme", theme);
   } catch {
     // storage blocked: the choice still applies for this visit
   }
-  if (theme === "system") delete document.documentElement.dataset.theme;
-  else document.documentElement.dataset.theme = theme;
+  document.documentElement.dataset.theme = theme;
   window.dispatchEvent(new Event(EVENT));
 }
 
+// Follows the system until clicked, then flips between light and dark.
 export default function ThemeToggle() {
-  const theme = useSyncExternalStore(subscribe, readTheme, () => "system" as const);
-  const next = ORDER[(ORDER.indexOf(theme) + 1) % ORDER.length];
-  const Icon = ICONS[theme];
+  const theme = useSyncExternalStore(subscribe, resolvedTheme, () => null);
+  const next: Theme = theme === "dark" ? "light" : "dark";
+  const Icon = theme === "dark" ? Moon : Sun;
 
   return (
     <button
       onClick={() => applyTheme(next)}
       className="grid size-[1.6em] place-items-center rounded-full transition-colors hover:bg-foreground/5 hover:text-foreground active:scale-90"
-      aria-label={`Theme: ${theme}. Switch to ${next}`}
-      title={`Theme: ${theme}`}
+      aria-label={`Switch to ${next} mode`}
+      title={`Switch to ${next} mode`}
     >
-      <Icon key={theme} className="size-[1em] animate-[fade-in_400ms_ease-out]" strokeWidth={1.75} />
+      {theme && <Icon key={theme} className="size-[1em] animate-[fade-in_400ms_ease-out]" strokeWidth={1.75} />}
     </button>
   );
 }
