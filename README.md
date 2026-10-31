@@ -11,4 +11,4 @@ Built with Next.js and Tailwind.
 npm run dev
 ```
 
-Copy lives in `app/page.tsx`. Put a `resume.pdf` in `public/` for the Resume link.
+Copy lives in `app/page.tsx`, projects in `lib/projects.ts`. Replace `public/resume.pdf` to update the resume.

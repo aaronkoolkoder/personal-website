@@ -10,7 +10,6 @@ const links = [
   { label: "GitHub", href: "https://github.com/aaronkoolkoder" },
   { label: "LinkedIn", href: "https://www.linkedin.com/in/aaronmerch" },
   { label: "Email", href: "mailto:avmercha@uwaterloo.ca" },
-  // drop resume.pdf into /public
   { label: "Resume", href: "/resume.pdf" },
 ];
 
