@@ -32,6 +32,7 @@ export const projects: Project[] = [
     details:
       "An F450 quadcopter on ArduPilot and MAVLink that detects faces and objects with OpenCV, then uses kinematic targeting to aim a water actuator at them. PID control and IMU/GPS telemetry keep it steady.",
     tags: ["Python", "OpenCV", "ArduPilot", "MAVLink", "Computer vision"],
+    image: "/projects/drone.jpg",
   },
   {
     id: "seal-a-driveway",
