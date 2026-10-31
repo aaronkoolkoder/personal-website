@@ -23,6 +23,7 @@ export const projects: Project[] = [
     tags: ["Swift", "SwiftUI", "Metal", "C++", "GLSL"],
     href: "https://github.com/aaronkoolkoder/wallpaperapp",
     linkLabel: "source",
+    image: "/projects/diorama.webp",
   },
   {
     id: "drone",
@@ -39,8 +40,9 @@ export const projects: Project[] = [
     details:
       "Lunate Studios' biggest game: 7.2M+ plays and 11K peak concurrent players before it was acquired. Server-side validation, networking, saved player data, and progression, economy and quest systems.",
     tags: ["Luau", "Roblox", "Game dev"],
-    href: "https://www.roblox.com/communities/261071327/Lunate-Studios#!/about",
-    linkLabel: "studio",
+    href: "https://www.roblox.com/games/120014184236770",
+    linkLabel: "play",
+    image: "/projects/seal-a-driveway.jpg",
   },
   {
     id: "extrovert-ai",
@@ -51,6 +53,7 @@ export const projects: Project[] = [
     tags: ["React", "Flask", "OpenAI", "Tavus", "Supabase"],
     href: "https://github.com/aaronkoolkoder/Extrovert-AI",
     linkLabel: "source",
+    image: "/projects/extrovert-ai.jpg",
   },
   {
     id: "table",
@@ -59,6 +62,7 @@ export const projects: Project[] = [
     details:
       "An iOS app for playing poker and blackjack with friends, with CPU opponents, game history and a 3D avatar creator.",
     tags: ["Swift", "SwiftUI", "Supabase", "iOS"],
+    image: "/projects/table.png",
   },
   {
     id: "signal",
@@ -67,6 +71,7 @@ export const projects: Project[] = [
     details:
       "Pulls from the sources you follow, scores what matters with AI, and sends a short daily brief on your schedule.",
     tags: ["Next.js", "TypeScript", "AI"],
+    image: "/projects/signal.png",
   },
 ];
 
