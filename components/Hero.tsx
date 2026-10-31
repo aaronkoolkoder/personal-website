@@ -99,7 +99,7 @@ export default function Hero() {
     <div className="relative shrink-0">
       <div
         aria-hidden="true"
-        className="relative -mb-14 h-[min(clamp(150px,32vw,380px),34dvh)] w-full overflow-hidden hero-fade pointer-events-none"
+        className="relative -mb-14 h-[min(clamp(150px,32vw,380px),34dvh)] [@media(max-height:480px)]:h-[26dvh] w-full overflow-hidden hero-fade pointer-events-none"
       >
         {/* Opening: the scene washes in from the page colour, soft and slightly zoomed, then settles. */}
         <div

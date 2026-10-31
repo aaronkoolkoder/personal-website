@@ -7,21 +7,21 @@ const projects = [
   {
     name: "Diorama",
     href: "https://github.com/aaronkoolkoder/wallpaperapp",
-    blurb: "live wallpapers for macOS, rendered natively in Metal",
+    blurb: "a native macOS wallpaper engine built on Metal",
   },
-  { name: "Table", blurb: "poker and blackjack with friends, with 3D avatars" },
-  { name: "Signal", blurb: "a daily AI brief built from the sources you actually read" },
+  { name: "Targeting drone", blurb: "an autonomous quadcopter that tracks targets with OpenCV" },
+  { name: "Seal A Driveway", blurb: "a multiplayer game with 7.2M+ plays" },
   {
     name: "Extrovert AI",
     href: "https://github.com/aaronkoolkoder/Extrovert-AI",
-    blurb: "practice hard conversations with lifelike AI personas",
+    blurb: "practice conversations with AI video personas",
   },
 ];
 
 const links = [
   { label: "GitHub", href: "https://github.com/aaronkoolkoder" },
-  // TODO: replace with your profile URL
-  { label: "LinkedIn", href: "https://www.linkedin.com/" },
+  { label: "LinkedIn", href: "https://www.linkedin.com/in/aaronmerch" },
+  { label: "Email", href: "mailto:avmercha@uwaterloo.ca" },
   // drop resume.pdf into /public
   { label: "Resume", href: "/resume.pdf" },
 ];
@@ -46,17 +46,17 @@ export default function Home() {
         <h1 className="mb-[clamp(0.6em,2dvh,1.5em)] text-[1.25em] font-medium tracking-tight">Aaron Merchant</h1>
 
         <div className="space-y-[clamp(0.6em,2dvh,1.5em)]">
-          <p>I like building software that feels good to use.</p>
+          <p>I like building software that runs on real hardware.</p>
 
           <p>
-            I&apos;m a student at the University of Waterloo. Right now I&apos;m making{" "}
-            <A href={projects[0].href}>live wallpapers for the Mac</A>
-            {" "}and a poker app for my friends.
+            I study Computer Engineering at Waterloo. I&apos;m currently building hardware-in-the-loop
+            testing for ZeroPilot, the open-source autopilot at{" "}
+            <A href="https://www.uwarg.com">WARG</A>.
           </p>
 
           <p>
-            I care most about the last ten percent of a project: the timing of an animation, an
-            empty state, the small details nobody asks for.
+            Before that I co-founded Lunate Studios and shipped 4 multiplayer games, and spent a summer
+            at IQC&apos;s Quantum School modelling qubits with linear algebra.
           </p>
 
           <div>
